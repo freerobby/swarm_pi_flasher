@@ -1,0 +1,33 @@
+---
+- hosts: all
+  tasks:
+  - name: Install prerequisites for PHD2
+    apt: name={{item}} state=installed
+    with_items:
+      - build-essential
+      - git
+      - cmake
+      - pkg-config
+      - libwxgtk3.0-dev
+      - wx-common
+      - wx3.0-i18n
+      - libindi-dev
+      - libnova-dev
+      - zlib1g-dev
+    become: true
+
+  - name: Download PHD2
+    git: depth=1 dest=/tmp/phd2 repo=https://github.com/OpenPHDGuiding/phd2.git
+
+  - name: Create tmp directory for PHD2 compilation
+    file: path=/tmp/phd2/tmp state=directory
+
+  - name: Configure PHD2
+    command: cmake .. chdir=/tmp/phd2/tmp creates=/tmp/phd2/tmp/Makefile
+
+  - name: Build PHD2
+    command: make chdir=/tmp/phd2/tmp creates=/tmp/phd2/tmp/phd2
+
+  - name: Install PHD2
+    command: make install chdir=/tmp/phd2/tmp creates=/usr/local/bin/phd2
+    become: true
