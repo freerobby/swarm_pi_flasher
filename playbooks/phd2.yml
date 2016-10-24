@@ -1,7 +1,7 @@
 ---
 - hosts: all
   tasks:
-  - name: Install prerequisites for PHD2
+  - name: Install prerequisites for building PHD2
     apt: name={{item}} state=installed
     with_items:
       - build-essential
@@ -34,4 +34,11 @@
 
   - name: Install PHD2
     command: make install chdir=/tmp/phd2/tmp creates=/usr/local/bin/phd2
+    become: true
+
+  - name: Install virtual graphical environment
+    apt: name={{item}} state=installed
+    with_items:
+      - xvfb
+      - x11vnc
     become: true
