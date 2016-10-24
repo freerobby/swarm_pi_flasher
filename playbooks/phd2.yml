@@ -17,7 +17,11 @@
     become: true
 
   - name: Download PHD2
-    git: depth=1 dest=/tmp/phd2 repo=https://github.com/OpenPHDGuiding/phd2.git
+    git: >
+      repo=https://github.com/OpenPHDGuiding/phd2.git
+      dest=/tmp/phd2
+      version=f8c684a0d94a38e924663561fafe1c0769e89351
+      depth=1
 
   - name: Create tmp directory for PHD2 compilation
     file: path=/tmp/phd2/tmp state=directory
