@@ -19,21 +19,21 @@
   - name: Download PHD2
     git: >
       repo=https://github.com/OpenPHDGuiding/phd2.git
-      dest=/tmp/phd2
+      dest=/home/vagrant/phd2
       version=f8c684a0d94a38e924663561fafe1c0769e89351
       depth=1
 
   - name: Create tmp directory for PHD2 compilation
-    file: path=/tmp/phd2/tmp state=directory
+    file: path=/home/vagrant/phd2/tmp state=directory
 
   - name: Configure PHD2
-    command: cmake .. chdir=/tmp/phd2/tmp creates=/tmp/phd2/tmp/Makefile
+    command: cmake .. chdir=/home/vagrant/phd2/tmp creates=/home/vagrant/phd2/tmp/Makefile
 
   - name: Build PHD2
-    command: make chdir=/tmp/phd2/tmp creates=/tmp/phd2/tmp/phd2
+    command: make chdir=/home/vagrant/phd2/tmp creates=/home/vagrant/phd2/tmp/phd2
 
   - name: Install PHD2
-    command: make install chdir=/tmp/phd2/tmp creates=/usr/local/bin/phd2
+    command: make install chdir=/home/vagrant/phd2/tmp creates=/usr/local/bin/phd2
     become: true
 
   - name: Install virtual graphical environment
@@ -42,3 +42,12 @@
       - xvfb
       - x11vnc
     become: true
+
+  - name: Create virtual display
+    shell: nohup Xvfb :1 -screen 0 800x600x16 &
+
+  - name: Launch VNC server
+    shell: x11vnc -display :1 -bg
+
+  - name: Launch PHD2
+    shell: DISPLAY=:1 nohup phd2 &
