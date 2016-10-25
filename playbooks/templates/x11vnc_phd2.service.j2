@@ -1,0 +1,10 @@
+[Unit]
+Description=VNC client for PHD2
+Requires=Xvfb_phd2.service
+After=Xvfb_phd2.service
+StopWhenUnneeded=true
+
+[Service]
+ExecStart=/usr/bin/x11vnc -display :1
+
+[Install]

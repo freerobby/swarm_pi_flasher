@@ -2,7 +2,7 @@
 - hosts: all
   tasks:
   - name: Install prerequisites for building PHD2
-    apt: name={{item}} state=installed
+    apt: name={{item}} state=installed update_cache=yes
     with_items:
       - build-essential
       - git
@@ -43,11 +43,26 @@
       - x11vnc
     become: true
 
-  - name: Create virtual display
-    shell: nohup Xvfb :1 -screen 0 800x600x16 &
+  - name: Create Virtual X frame buffer service for PHD2
+    template: src=templates/Xvfb_phd2.service.j2 dest=/etc/systemd/system/Xvfb_phd2.service mode=0644 owner=root group=root
+    become: true
 
-  - name: Launch VNC server
-    shell: x11vnc -display :1 -bg
+  - name: Create VNC service for PHD2
+    template: src=templates/x11vnc_phd2.service.j2 dest=/etc/systemd/system/x11vnc_phd2.service mode=0644 owner=root group=root
+    become: true
 
-  - name: Launch PHD2
-    shell: DISPLAY=:1 nohup phd2 &
+  - name: Create PHD2 service
+    template: src=templates/phd2.service.j2 dest=/etc/systemd/system/phd2.service mode=0644 owner=root group=root
+    become: true
+
+  - name: Enable and start Virtual X frame buffer service for PHD2
+    service: name=Xvfb_phd2 enabled=yes state=started
+    become: true
+
+  - name: Enable and start VNC service for PHD2
+    service: name=x11vnc_phd2 enabled=yes state=started
+    become: true
+
+  - name: Enable and start PHD2 service
+    service: name=phd2 enabled=yes state=started
+    become: true
