@@ -55,6 +55,10 @@
     template: src=templates/phd2.service.j2 dest=/etc/systemd/system/phd2.service mode=0644 owner=root group=root
     become: true
 
+  - name: Reload system services
+    command: systemctl daemon-reload
+    become: true
+
   - name: Enable and start Virtual X frame buffer service for PHD2
     service: name=Xvfb_phd2 enabled=yes state=started
     become: true
