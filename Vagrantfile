@@ -21,4 +21,5 @@ Vagrant.configure(2) do |config|
   (5900..5910).each do |port|
     config.vm.network "forwarded_port", guest: port, host: port
   end
+  config.vm.network "forwarded_port", guest: 4300, host: 4300
 end
