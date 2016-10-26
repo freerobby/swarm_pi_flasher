@@ -1,47 +1,40 @@
 ---
 - hosts: all
   vars:
-    XServiceName: phd2
-    XServiceExec: /usr/local/bin/phd2
-    XServiceDisplayNumber: "1"
-    XServiceDisplayWidth: "860"
-    XServiceDisplayHeight: "660"
+    XServiceName: lin_guider
+    XServiceExec: "{{ ansible_user_dir }}/lin_guider_pack/lin_guider/lin_guider"
+    XServiceDisplayNumber: "2"
+    XServiceDisplayWidth: "645"
+    XServiceDisplayHeight: "500"
   tasks:
   - name: Install prerequisites for building {{ XServiceName }}
     apt: name={{item}} state=installed update_cache=yes
     with_items:
+      - libusb-1.0-0-dev
+      - libqt4-dev
+      - libftdi-dev
+      - fxload
+      - wget
+      - bzip2
+      - tar
       - build-essential
-      - git
-      - cmake
-      - pkg-config
-      - libwxgtk3.0-dev
-      - wx-common
-      - wx3.0-i18n
-      - libindi-dev
-      - libnova-dev
-      - zlib1g-dev
     become: true
 
   - name: Download {{ XServiceName }}
-    git: >
-      repo=https://github.com/OpenPHDGuiding/phd2.git
-      dest={{ ansible_user_dir }}/phd2
-      version=f8c684a0d94a38e924663561fafe1c0769e89351
-      depth=1
+    command: wget http://downloads.sourceforge.net/project/linguider/4.1.0/lin_guider-4.1.0.tar.bz2 chdir={{ ansible_user_dir }} creates={{ ansible_user_dir }}/lin_guider-4.1.0.tar.bz2
 
-  - name: Create tmp directory for {{ XServiceName }} compilation
-    file: path={{ ansible_user_dir }}/phd2/tmp state=directory
+  - name: Decompress {{ XServiceName }}
+    command: bunzip2 lin_guider-4.1.0.tar.bz2 chdir={{ ansible_user_dir }} creates={{ ansible_user_dir }}/lin_guider-4.1.0.tar
+
+  - name: Extract {{ XServiceName }}
+    command: tar xf lin_guider-4.1.0.tar chdir={{ ansible_user_dir }} creates={{ ansible_user_dir }}/lin_guider_pack/lin_guider
 
   - name: Configure {{ XServiceName }}
-    command: cmake .. chdir={{ ansible_user_dir }}/phd2/tmp creates={{ ansible_user_dir }}/phd2/tmp/Makefile
+    shell: ./configure chdir={{ ansible_user_dir }}/lin_guider_pack/lin_guider creates={{ ansible_user_dir }}/lin_guider_pack/lin_guider/Makefile
 
   - name: Build {{ XServiceName }}
-    command: make -j {{ ansible_processor_vcpus }} chdir={{ ansible_user_dir }}/phd2/tmp creates={{ ansible_user_dir }}/phd2/tmp/phd2
-
-  - name: Install {{ XServiceName }}
-    command: make install chdir={{ ansible_user_dir }}/phd2/tmp creates={{ XServiceExec }}
-    become: true
-
+    command: make -j {{ ansible_processor_vcpus }} chdir={{ ansible_user_dir }}/lin_guider_pack/lin_guider creates={{ XServiceExec }}
+  
   - name: Install virtual graphical environment
     apt: name={{item}} state=installed
     with_items:
@@ -57,7 +50,7 @@
     template: src=templates/x11vnc_xservice.service.j2 dest=/etc/systemd/system/x11vnc_{{ XServiceName }}.service mode=0644 owner=root group=root
     become: true
 
-  - name: Create {{ XServiceName}} service
+  - name: Create {{ XServiceName }} service
     template: src=templates/xservice.service.j2 dest=/etc/systemd/system/{{ XServiceName }}.service mode=0644 owner=root group=root
     become: true
 

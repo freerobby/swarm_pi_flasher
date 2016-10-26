@@ -1,0 +1,11 @@
+[Unit]
+Description=VNC client for {{ XServiceName }}
+Requires=Xvfb_{{ XServiceName }}.service
+After=Xvfb_{{ XServiceName }}.service
+StopWhenUnneeded=true
+
+[Service]
+ExecStart=/usr/bin/x11vnc -display :{{ XServiceDisplayNumber }} -N -forever
+User={{ ansible_user_id }}
+
+[Install]

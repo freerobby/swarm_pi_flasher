@@ -1,2 +1,4 @@
 ---
+- hosts: all
 - include: playbooks/phd2.yml
+- include: playbooks/lin_guider.yml

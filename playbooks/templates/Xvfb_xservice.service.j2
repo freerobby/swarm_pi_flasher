@@ -1,0 +1,9 @@
+[Unit]
+Description=Virtual X frame buffer for {{ XServiceName }}
+StopWhenUnneeded=true
+
+[Service]
+ExecStart=/usr/bin/Xvfb :{{ XServiceDisplayNumber }} -screen 0 {{ XServiceDisplayWidth }}x{{ XServiceDisplayHeight }}x16
+User={{ ansible_user_id }}
+
+[Install]

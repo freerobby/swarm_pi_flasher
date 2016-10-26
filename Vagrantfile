@@ -18,5 +18,7 @@ Vagrant.configure(2) do |config|
     vb.customize ["modifyvm", :id, "--cpus", 8]
   end
 
-  config.vm.network "forwarded_port", guest: 5900, host: 5900
+  (5900..5910).each do |port|
+    config.vm.network "forwarded_port", guest: port, host: port
+  end
 end
