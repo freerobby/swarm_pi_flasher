@@ -1,0 +1,90 @@
+---
+- hosts: all
+  vars:
+    XServiceName: OpenSkyImager
+    XServiceExec: /usr/local/bin/OpenSkyImager/gtkImager
+    XServiceDisplayNumber: "3"
+    XServiceDisplayWidth: "870"
+    XServiceDisplayHeight: "550"
+  tasks:
+  - name: Install prerequisites for building {{ XServiceName }}
+    apt: name={{item}} state=installed update_cache=yes
+    with_items:
+      - git
+      - libgtk-3-0
+      - libgtk-3-dev
+      - libgtk2.0-0
+      - libgtk2.0-dev
+      - libglib2.0-0
+      - libglib2.0-dev
+      - libcfitsio3-dev
+      - libudev-dev
+      - fxload
+      - cmake
+    become: true
+
+  - name: Install atik camera library (x64)
+    apt: deb=http://download.cloudmakers.eu/atikccd-1.11-amd64.deb state=installed update_cache=no
+    become: true
+    when: ansible_architecture == "x86_64"
+
+  - name: Install atik camera library (ARM)
+    apt: deb=http://download.cloudmakers.eu/atikccd-1.11-armhf.deb state=installed update_cache=no
+    become: true
+    when: ansible_architecture == "armv7l"
+
+  - name: Download {{ XServiceName }}
+    git: >
+      repo=https://github.com/freerobby/OpenSkyImager.git
+      dest={{ ansible_user_dir }}/{{ XServiceName }}
+      version=ae6ca026813ca2b498ffd45954e6df4abe26f152
+      depth=1
+
+  - name: Create build directory for {{ XServiceName }} compilation
+    file: path={{ ansible_user_dir }}/{{ XServiceName }}/build state=directory
+
+  - name: Configure {{ XServiceName }}
+    command: cmake -D FORCE_QHY_ONLY=false .. chdir={{ ansible_user_dir }}/{{ XServiceName }}/build creates={{ ansible_user_dir }}/{{ XServiceName }}/build/Makefile
+
+  - name: Build {{ XServiceName }}
+    # OSI's dependency chain cannot guarantee successful parallel builds, so only use one core.
+    command: make -j 1 chdir={{ ansible_user_dir }}/{{ XServiceName }}/build creates={{ ansible_user_dir }}/{{ XServiceName }}/build/gtk/gtkImager
+
+  - name: Install {{ XServiceName }}
+    command: make install chdir={{ ansible_user_dir }}/{{ XServiceName }}/build creates={{ XServiceExec }}
+    become: true
+
+  - name: Install virtual graphical environment
+    apt: name={{item}} state=installed
+    with_items:
+      - xvfb
+      - x11vnc
+    become: true
+
+  - name: Create Virtual X frame buffer service for {{ XServiceName }}
+    template: src=templates/Xvfb_xservice.service.j2 dest=/etc/systemd/system/Xvfb_{{ XServiceName }}.service mode=0644 owner=root group=root
+    become: true
+
+  - name: Create VNC service for {{ XServiceName }}
+    template: src=templates/x11vnc_xservice.service.j2 dest=/etc/systemd/system/x11vnc_{{ XServiceName }}.service mode=0644 owner=root group=root
+    become: true
+
+  - name: Create {{ XServiceName}} service
+    template: src=templates/xservice.service.j2 dest=/etc/systemd/system/{{ XServiceName }}.service mode=0644 owner=root group=root
+    become: true
+
+  - name: Reload system services
+    command: systemctl daemon-reload
+    become: true
+
+  - name: Enable and start Virtual X frame buffer service for {{ XServiceName }}
+    service: name=Xvfb_{{ XServiceName }} enabled=yes state=started
+    become: true
+
+  - name: Enable and start VNC service for {{ XServiceName }}
+    service: name=x11vnc_{{ XServiceName }} enabled=yes state=started
+    become: true
+
+  - name: Enable and start {{ XServiceName }} service
+    service: name={{ XServiceName }} enabled=yes state=started
+    become: true
