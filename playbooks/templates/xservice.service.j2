@@ -1,7 +1,7 @@
 [Unit]
 Description={{ XServiceName }}
-Requires=Xvfb_{{ XServiceName }}.service x11vnc_{{ XServiceName }}.service
-After=Xvfb_{{ XServiceName }}.service x11vnc_{{ XServiceName }}.service
+Requires=Xvfb_{{ XServiceName }}.service x11vnc_{{ XServiceName }}.service websockify_{{ XServiceName }}.service
+After=Xvfb_{{ XServiceName }}.service x11vnc_{{ XServiceName }}.service websockify_{{ XServiceName }}.service
 
 [Service]
 Environment="DISPLAY=:{{ XServiceDisplayNumber }}"

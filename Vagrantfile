@@ -23,8 +23,11 @@ Vagrant.configure(2) do |config|
     ]
   end
 
-  (5900..5910).each do |port|
-    config.vm.network "forwarded_port", guest: port, host: port
+  (0..9).each do |display_port_suffix|
+    vnc_port = 5900 + display_port_suffix
+    websockify_port = 6100 + display_port_suffix
+    config.vm.network "forwarded_port", guest: vnc_port, host: vnc_port
+    config.vm.network "forwarded_port", guest: websockify_port, host: websockify_port
   end
   config.vm.network "forwarded_port", guest: 4300, host: 4300
 end

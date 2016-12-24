@@ -40,6 +40,7 @@
     with_items:
       - xvfb
       - x11vnc
+      - websockify
     become: true
 
   - name: Create Virtual X frame buffer service for {{ XServiceName }}
@@ -48,6 +49,10 @@
 
   - name: Create VNC service for {{ XServiceName }}
     template: src=templates/x11vnc_xservice.service.j2 dest=/etc/systemd/system/x11vnc_{{ XServiceName }}.service mode=0644 owner=root group=root
+    become: true
+
+  - name: Create websockify proxy service for x11vnc_{{ XServiceName }}
+    template: src=templates/websockify_xservice.service.j2 dest=/etc/systemd/system/websockify_{{ XServiceName }}.service mode=0644 owner=root group=root
     become: true
 
   - name: Create {{ XServiceName }} service
@@ -64,6 +69,10 @@
 
   - name: Enable and start VNC service for {{ XServiceName }}
     service: name=x11vnc_{{ XServiceName }} enabled=yes state=started
+    become: true
+
+  - name: Enable and start websockify proxy service for x11vnc_{{ XServiceName }}
+    service: name=websockify_{{ XServiceName }} enabled=yes state=started
     become: true
 
   - name: Enable and start {{ XServiceName }} service
