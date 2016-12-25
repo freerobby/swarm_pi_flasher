@@ -1,0 +1,10 @@
+---
+# tasks file for avinetworks.docker
+- name: Docker | Include Specific Variables
+  include_vars: "{{ ansible_distribution }}.yml"
+
+- name: Docker | Start Installation
+  include: "{{ ansible_pkg_mgr }}.yml"
+
+- name: Start the Docker Process and Start at Boot
+  service: name=docker enabled=yes state=started

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+# Usage:
+# ./deploy-pi <pi ip address>
+
+echo Type "raspberry" when prompted.
+/usr/local/bin/ansible-playbook -s bootstrap.yml -i $1, -vvv -u pi -k
