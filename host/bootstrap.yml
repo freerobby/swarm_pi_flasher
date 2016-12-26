@@ -3,3 +3,53 @@
   roles:
     - role: avinetworks.docker
       become: true
+  tasks:
+    - name: Create directory
+      file:
+        recurse: true
+        path: /tmp/Docker
+        state: directory
+    - name: Move Docker files
+      copy:
+        src: ../containers/
+        dest: /tmp/Docker/
+        owner: vagrant
+        group: vagrant
+        mode: 0644
+    - name: Install apt dependencies
+      apt: name={{item}} state=installed
+      with_items:
+        - python-setuptools
+      become: true
+    - name: Install pip
+      easy_install:
+        name: pip
+      become: true
+    - name: Install python dependencies
+      pip:
+        name: docker-py
+      become: true
+    - name: Generate base image
+      docker_image:
+        name: base
+        path: /tmp/Docker/base
+        pull: false
+      become: true
+    - name: Generate lin_guider image
+      docker_image:
+        name: lin_guider
+        path: /tmp/Docker/lin_guider
+        pull: false
+      become: true
+    - name: Generate phd2 image
+      docker_image:
+        name: phd2
+        path: /tmp/Docker/phd2
+        pull: false
+      become: true
+    - name: Generate OpenSkyImager image
+      docker_image:
+        name: openskyimager
+        path: /tmp/Docker/openskyimager
+        pull: false
+      become: true

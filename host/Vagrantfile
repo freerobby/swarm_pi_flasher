@@ -3,6 +3,8 @@ Vagrant.require_version ">= 1.7.0"
 Vagrant.configure(2) do |config|
   config.vm.box = "debian/jessie64"
 
+  # config.vm.network :private_network, ip: "10.0.2.2"
+
   config.vm.provision "ansible" do |ansible|
     ansible.verbose = "vvv"
     ansible.playbook = "bootstrap.yml"
@@ -23,10 +25,10 @@ Vagrant.configure(2) do |config|
     ]
   end
 
-  # (0..9).each do |display_port_suffix|
-  #   vnc_port = 5900 + display_port_suffix
-  #   websockify_port = 6100 + display_port_suffix
-  #   config.vm.network "forwarded_port", guest: vnc_port, host: vnc_port
-  #   config.vm.network "forwarded_port", guest: websockify_port, host: websockify_port
-  # end
+  (0..9).each do |display_port_suffix|
+    vnc_port = 5900 + display_port_suffix
+    websockify_port = 6100 + display_port_suffix
+    config.vm.network "forwarded_port", guest: vnc_port, host: vnc_port
+    config.vm.network "forwarded_port", guest: websockify_port, host: websockify_port
+  end
 end
