@@ -1,0 +1,64 @@
+FROM base
+
+# Install prerequisites for {{container_name}}
+RUN apt-get -y install \
+  cmake \
+  fxload \
+  libcfitsio3-dev \
+  libglib2.0-0 \
+  libglib2.0-dev \
+  libgtk2.0-0 \
+  libgtk2.0-dev \
+  libgtk-3-0 \
+  libgtk-3-dev \
+  libudev-dev
+
+# Install ATIK Camera support on supported platforms
+RUN apt-get -y install \
+  sudo \
+  wget
+
+# Detected {{ansible_machine}} architecture.
+{% if ansible_machine == "x86_64" -%}
+  # Atik cameras are supported.
+  RUN wget http://download.cloudmakers.eu/atikccd-1.11-amd64.deb
+  RUN dpkg -i atikccd-1.11-amd64.deb; apt-get -fy install
+{% elif ansible_machine == "armv7l" -%}
+  # Atik cameras are supported.
+  RUN wget http://download.cloudmakers.eu/atikccd-1.11-armhf.deb
+  RUN dpkg -i atikccd-1.11-armhf.deb; apt-get -fy install
+{% else -%}
+  # Atik cameras are not supported.
+{% endif %}
+
+# Download, build and install {{container_name}}
+RUN apt-get -y install git
+RUN git clone --depth 1 https://github.com/freerobby/OpenSkyImager.git /OpenSkyImager
+RUN mkdir /OpenSkyImager/build
+RUN cd /OpenSkyImager/build && cmake -D FORCE_QHY_ONLY=false ..
+RUN cd /OpenSkyImager/build && make -j 1 # OSI's dependency chain cannot guarantee successful parallel builds, so only use one core.
+RUN cd /OpenSkyImager/build && make install
+
+# Install graphical environment
+RUN apt-get -y install \
+  websockify \
+  x11vnc \
+  xvfb
+
+# Needed at runtime for websockify
+RUN apt-get -y install \
+  python-pip
+
+# Create a script to run our full graphical environment.
+RUN echo "#!/usr/bin/env sh" > /start.sh
+RUN echo "/usr/bin/Xvfb :{{xdisplay}} -screen 0 {{xwindow_width}}x{{xwindow_height}}x16 &" >> /start.sh
+RUN echo "/usr/bin/x11vnc -display :{{xdisplay}} -N -forever &" >> /start.sh
+RUN echo "/usr/bin/websockify {{websockify_port}} localhost:{{vnc_port}} &" >> /start.sh
+RUN echo "DISPLAY=:{{xdisplay}} {{exec}}" >> /start.sh
+RUN echo "" >> /start.sh
+RUN chmod +x /start.sh
+
+EXPOSE {{vnc_port}}
+EXPOSE {{websockify_port}}
+
+CMD ["/start.sh"]

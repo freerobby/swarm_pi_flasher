@@ -1,0 +1,8 @@
+---
+container_name: lin_guider
+exec: /lin_guider_pack/lin_guider/lin_guider
+vnc_port: 5900
+websockify_port: 6100
+xdisplay: 0
+xwindow_width: 645
+xwindow_height: 500

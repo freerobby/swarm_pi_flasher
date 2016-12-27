@@ -1,0 +1,17 @@
+FROM base
+
+# Install prerequisites for {{container_name}}
+RUN apt-get -y install \
+  git \
+  net-tools \
+  python
+
+# Download, build and install {{container_name}}
+RUN apt-get -y install wget
+RUN wget https://github.com/novnc/noVNC/archive/v0.6.1.tar.gz
+RUN gunzip v0.6.1.tar.gz
+RUN tar xf v0.6.1.tar
+RUN cd noVNC-0.6.1/utils && ls -alFh
+
+EXPOSE {{websockify_port}}
+CMD ["/noVNC-0.6.1/utils/launch.sh", "--listen", "{{websockify_port}}"]

@@ -1,5 +1,75 @@
 ---
 - hosts: all
-- include: playbooks/phd2.yml
-- include: playbooks/lin_guider.yml
-- include: playbooks/open_sky_imager.yml
+  roles:
+    - role: avinetworks.docker
+      become: true
+
+- hosts: all
+  tasks:
+    - name: Install apt dependencies
+      apt: name={{item}} state=installed
+      with_items:
+        - python-setuptools
+      become: true
+
+    - name: Install pip
+      easy_install:
+        name: pip
+      become: true
+
+    - name: Install python dependencies
+      pip:
+        name: docker-py
+      become: true
+
+- hosts: all
+  roles:
+    - role: base
+      become: true
+    - role: novnc
+      become: true
+    - role: lin_guider
+      become: true
+    - role: phd2
+      become: true
+    - role: openskyimager
+      become: true
+  tasks:
+    - name: Run novnc
+      docker_container:
+        name: novnc
+        image: novnc
+        pull: false
+        published_ports:
+          - "6080:6080"
+      become: true
+
+    - name: Run lin_guider
+      docker_container:
+        name: lin_guider
+        image: lin_guider
+        pull: false
+        published_ports:
+          - "5901:5900"
+          - "6101:6100"
+      become: true
+
+    - name: Run phd2
+      docker_container:
+        name: phd2
+        image: phd2
+        pull: false
+        published_ports:
+          - "5902:5900"
+          - "6102:6100"
+      become: true
+
+    - name: Run openskyimager
+      docker_container:
+        name: openskyimager
+        image: openskyimager
+        pull: false
+        published_ports:
+          - "5903:5900"
+          - "6103:6100"
+      become: true

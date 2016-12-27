@@ -1,0 +1,8 @@
+---
+container_name: phd2
+exec: /usr/local/bin/phd2
+vnc_port: 5900
+websockify_port: 6100
+xdisplay: 0
+xwindow_width: 860
+xwindow_height: 660

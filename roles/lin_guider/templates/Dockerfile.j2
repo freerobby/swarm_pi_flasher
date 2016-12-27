@@ -1,10 +1,6 @@
 FROM base
 
-ENV X_SERVICE_NAME=lin_guider
-ENV X_DISPLAY_WIDTH=645
-ENV X_DISPLAY_HEIGHT=500
-
-# Install prerequisites for lin_guider
+# Install prerequisites for {{container_name}}
 RUN apt-get -y install \
   build-essential \
   bzip2 \
@@ -14,7 +10,7 @@ RUN apt-get -y install \
   libusb-1.0-0-dev \
   tar
 
-# Download, build and install lin_guider
+# Download, build and install {{container_name}}
 RUN apt-get -y install wget
 RUN wget http://downloads.sourceforge.net/project/linguider/4.1.0/lin_guider-4.1.0.tar.bz2
 RUN bunzip2 lin_guider-4.1.0.tar.bz2
@@ -34,14 +30,14 @@ RUN apt-get -y install \
 
 # Create a script to run our full graphical environment.
 RUN echo "#!/usr/bin/env sh" > /start.sh
-RUN echo "/usr/bin/Xvfb :0 -screen 0 ${X_DISPLAY_WIDTH}x${X_DISPLAY_HEIGHT}x16 &" >> /start.sh
-RUN echo "/usr/bin/x11vnc -display :0 -N -forever &" >> /start.sh
-RUN echo "/usr/bin/websockify 6100 localhost:5900 &" >> /start.sh
-RUN echo "DISPLAY=:0 /lin_guider_pack/lin_guider/lin_guider" >> /start.sh
+RUN echo "/usr/bin/Xvfb :{{xdisplay}} -screen 0 {{xwindow_width}}x{{xwindow_height}}x16 &" >> /start.sh
+RUN echo "/usr/bin/x11vnc -display :{{xdisplay}} -N -forever &" >> /start.sh
+RUN echo "/usr/bin/websockify {{websockify_port}} localhost:{{vnc_port}} &" >> /start.sh
+RUN echo "DISPLAY=:{{xdisplay}} {{exec}}" >> /start.sh
 RUN echo "" >> /start.sh
 RUN chmod +x /start.sh
 
-EXPOSE 5900
-EXPOSE 6100
+EXPOSE {{vnc_port}}
+EXPOSE {{websockify_port}}
 
 CMD ["/start.sh"]

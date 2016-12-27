@@ -1,0 +1,24 @@
+---
+- name: Create staging area for Dockerfile.
+  file:
+    recurse: true
+    path: /tmp/Docker/{{container_name}}
+    state: directory
+  become: true
+
+- name: Generate Dockerfile
+  template:
+    src: templates/Dockerfile.j2
+    dest: /tmp/Docker/{{container_name}}/Dockerfile
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+
+- name: Generate image
+  docker_image:
+    name: "{{container_name}}"
+    path: /tmp/Docker/{{container_name}}
+    pull: false
+    force: true
+  become: true

@@ -1,0 +1,3 @@
+---
+container_name: novnc
+websockify_port: 6080
