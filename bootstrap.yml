@@ -26,6 +26,8 @@
   roles:
     - role: base
       become: true
+    - role: xapplication_base
+      become: true
     - role: novnc
       become: true
     - role: lin_guider

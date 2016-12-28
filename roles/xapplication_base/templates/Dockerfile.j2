@@ -1,0 +1,8 @@
+FROM base
+
+# websockify needs python-pip at runtime
+RUN apt-get -y install \
+  python-pip \
+  websockify \
+  x11vnc \
+  xvfb

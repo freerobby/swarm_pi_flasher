@@ -1,4 +1,4 @@
-FROM base
+FROM xapplication_base
 
 # Install prerequisites for {{container_name}}
 RUN apt-get -y install \
@@ -38,16 +38,6 @@ RUN mkdir /OpenSkyImager/build
 RUN cd /OpenSkyImager/build && cmake -D FORCE_QHY_ONLY=false ..
 RUN cd /OpenSkyImager/build && make -j 1 # OSI's dependency chain cannot guarantee successful parallel builds, so only use one core.
 RUN cd /OpenSkyImager/build && make install
-
-# Install graphical environment
-RUN apt-get -y install \
-  websockify \
-  x11vnc \
-  xvfb
-
-# Needed at runtime for websockify
-RUN apt-get -y install \
-  python-pip
 
 # Create a script to run our full graphical environment.
 RUN echo "#!/usr/bin/env sh" > /start.sh

@@ -1,4 +1,4 @@
-FROM base
+FROM xapplication_base
 
 # Install prerequisites for {{container_name}}
 RUN apt-get -y install \
@@ -17,16 +17,6 @@ RUN bunzip2 lin_guider-4.1.0.tar.bz2
 RUN tar xf lin_guider-4.1.0.tar
 RUN cd ./lin_guider_pack/lin_guider && ./configure
 RUN cd ./lin_guider_pack/lin_guider && make -j $(grep -c ^processor /proc/cpuinfo)
-
-# Install graphical environment
-RUN apt-get -y install \
-  websockify \
-  x11vnc \
-  xvfb
-
-# Needed at runtime for websockify
-RUN apt-get -y install \
-  python-pip
 
 # Create a script to run our full graphical environment.
 RUN echo "#!/usr/bin/env sh" > /start.sh
