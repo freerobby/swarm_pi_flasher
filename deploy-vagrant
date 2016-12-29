@@ -4,7 +4,7 @@
 # ./deploy-vagrant
 
 if (/usr/local/bin/vagrant status | grep "default.*not created (virtualbox)"); then
-  /usr/local/bin/vagrant up
+  time /usr/local/bin/vagrant up
 else
-  /usr/local/bin/vagrant provision
+  time /usr/local/bin/vagrant provision
 fi
