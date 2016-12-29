@@ -20,6 +20,8 @@ RUN cd ./lin_guider_pack/lin_guider && make -j $(grep -c ^processor /proc/cpuinf
 
 # Create a script to run our full graphical environment.
 RUN echo "#!/usr/bin/env sh" > /start.sh
+# Docker doesn't clean the file system on restart, so we need to clean any old lock that may exist
+RUN echo "/bin/rm -f /tmp/.X{{xdisplay}}-lock" >> /start.sh
 RUN echo "/usr/bin/Xvfb :{{xdisplay}} -screen 0 {{xwindow_width}}x{{xwindow_height}}x16 &" >> /start.sh
 RUN echo "/usr/bin/x11vnc -display :{{xdisplay}} -N -forever &" >> /start.sh
 RUN echo "/usr/bin/websockify {{websockify_port}} localhost:{{vnc_port}} &" >> /start.sh
