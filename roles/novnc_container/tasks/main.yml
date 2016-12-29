@@ -1,0 +1,59 @@
+---
+
+################################
+# Ansible-Docker Prerequisites #
+################################
+
+- name: Install apt dependencies
+  apt: name={{item}} state=installed
+  with_items:
+    - python-setuptools
+  become: true
+
+- name: Install pip
+  easy_install:
+    name: pip
+  become: true
+
+- name: Install python dependencies
+  pip:
+    name: docker-py
+  become: true
+
+######################################
+# Build our Application Docker Image #
+######################################
+
+- name: Create staging area for {{service_name}} docker image
+  file:
+    recurse: true
+    path: /tmp/Docker/{{service_name}}
+    state: directory
+  become: true
+
+- name: Generate Dockerfile for {{service_name}} docker image
+  template:
+    src: templates/Dockerfile.j2
+    dest: /tmp/Docker/{{service_name}}/Dockerfile
+    mode: 0644
+    owner: root
+    group: root
+  become: true
+
+- name: Build {{service_name}} docker image
+  docker_image:
+    name: "{{service_name}}"
+    path: /tmp/Docker/{{service_name}}
+    pull: false
+    force: true
+  become: true
+
+- name: Run {{service_name}} service via docker container
+  docker_container:
+    name: "{{service_name}}"
+    image: "{{service_name}}"
+    pull: false
+    published_ports:
+      - "{{websockify_port}}:6080"
+    restart_policy: always
+  become: true

@@ -5,77 +5,95 @@
       become: true
 
 - hosts: all
-  tasks:
-    - name: Install apt dependencies
-      apt: name={{item}} state=installed
-      with_items:
-        - python-setuptools
-      become: true
-
-    - name: Install pip
-      easy_install:
-        name: pip
-      become: true
-
-    - name: Install python dependencies
-      pip:
-        name: docker-py
-      become: true
-
-- hosts: all
   roles:
-    - role: base
-      become: true
-    - role: xapplication_base
-      become: true
-    - role: novnc
-      become: true
-    - role: lin_guider
-      become: true
-    - role: phd2
-      become: true
-    - role: openskyimager
-      become: true
-  tasks:
-    - name: Run novnc
-      docker_container:
-        name: novnc
-        image: novnc
-        pull: false
-        published_ports:
-          - "6080:6080"
-        restart_policy: always
-      become: true
-
-    - name: Run lin_guider
-      docker_container:
-        name: lin_guider
-        image: lin_guider
-        pull: false
-        published_ports:
-          - "5901:5900"
-          - "6101:6100"
-        restart_policy: always
+    - role: xapplication_container
+      vars:
+        service_name: lin_guider
+        gui_width: 645
+        gui_height: 500
+        build_packages:
+          - build-essential
+          - bzip2
+          - fxload
+          - libftdi-dev
+          - libqt4-dev
+          - libusb-1.0-0-dev
+          - tar
+          - wget
+        build_steps:
+          - wget http://downloads.sourceforge.net/project/linguider/4.1.0/lin_guider-4.1.0.tar.bz2
+          - bunzip2 lin_guider-4.1.0.tar.bz2
+          - tar xf lin_guider-4.1.0.tar
+          - cd ./lin_guider_pack/lin_guider && ./configure
+          - cd ./lin_guider_pack/lin_guider && make -j $(grep -c ^processor /proc/cpuinfo)
+        stage_files:
+          - /lin_guider_pack/lin_guider/lin_guider
+        executable: lin_guider
+        public_vnc_port: 5901
+        public_websockify_port: 6101
       become: true
 
-    - name: Run phd2
-      docker_container:
-        name: phd2
-        image: phd2
-        pull: false
-        published_ports:
-          - "5902:5900"
-          - "6102:6100"
-        restart_policy: always
+    - role: xapplication_container
+      vars:
+        service_name: phd2
+        gui_width: 860
+        gui_height: 660
+        build_packages:
+          - build-essential
+          - cmake
+          - git
+          - libindi-dev
+          - libnova-dev
+          - libwxgtk3.0-dev
+          - pkg-config
+          - wx-common
+          - wx3.0-i18n
+          - zlib1g-dev
+        build_steps:
+          - git clone --depth 1 https://github.com/OpenPHDGuiding/phd2.git /phd2
+          - mkdir /phd2/tmp
+          - cd /phd2/tmp && cmake ..
+          - cd /phd2/tmp && make -j $(grep -c ^processor /proc/cpuinfo)
+        stage_files:
+          - /phd2/tmp/phd2
+        executable: phd2
+        public_vnc_port: 5902
+        public_websockify_port: 6102
       become: true
 
-    - name: Run openskyimager
-      docker_container:
-        name: openskyimager
-        image: openskyimager
-        pull: false
-        published_ports:
-          - "5903:5900"
-          - "6103:6100"
-        restart_policy: always
+    - role: xapplication_container
+      vars:
+        service_name: openskyimager
+        gui_width: 870
+        gui_height: 550
+        build_packages:
+          - cmake
+          - fxload
+          - git
+          - libcfitsio3-dev
+          - libglib2.0-0
+          - libglib2.0-dev
+          - libgtk2.0-0
+          - libgtk2.0-dev
+          - libgtk-3-0
+          - libgtk-3-dev
+          - libudev-dev
+          - sudo
+          - wget
+        build_steps:
+          - if [ $(lscpu | grep Architecture | sed s/Architecture:\\s\\+//) = "x86_64" ]; then wget http://download.cloudmakers.eu/atikccd-1.11-amd64.deb; dpkg -i atikccd-1.11-amd64.deb; apt-get -fy install; fi
+          - if [ $(lscpu | grep Architecture | sed s/Architecture:\\s\\+//) = "armv7l" ]; then wget http://download.cloudmakers.eu/atikccd-1.11-armhf.deb; dpkg -i atikccd-1.11-armhf.deb; apt-get -fy install; fi
+          - git clone --depth 1 https://github.com/freerobby/OpenSkyImager.git /OpenSkyImager
+          - mkdir /OpenSkyImager/build
+          - cd /OpenSkyImager/build && cmake -D FORCE_QHY_ONLY=false ..
+          - cd /OpenSkyImager/build && make -j 1 # OSI's dependency chain cannot guarantee successful parallel builds, so only use one core.
+        stage_files:
+          - /OpenSkyImager/build/gtk/gtkImager
+        executable: gtkImager
+        public_vnc_port: 5903
+        public_websockify_port: 6103
       become: true
+
+    - role: novnc_container
+      become: true
+
