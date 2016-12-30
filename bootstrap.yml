@@ -66,7 +66,9 @@
         service_name: openskyimager
         gui_width: 870
         gui_height: 550
+        # build-essential seems to be needed on raspbian, but not jessie. Maybe make/g++ on jessie image?
         build_packages:
+          - build-essential
           - cmake
           - fxload
           - git
@@ -95,5 +97,10 @@
       become: true
 
     - role: novnc_container
+      become: true
+
+  tasks:
+    - name: Start containers
+      shell: docker start $(docker ps -aq)
       become: true
 

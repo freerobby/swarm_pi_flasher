@@ -1,4 +1,10 @@
-FROM debian:jessie
+{% if ansible_machine == "x86_64" -%}
+  FROM debian:jessie
+{% elif ansible_machine == "armv7l" -%}
+  FROM resin/rpi-raspbian:jessie-20160831
+{% else -%}
+  # No docker base available for architecture: {{ansible_machine}}
+{% endif %}
 RUN apt-get -y update
 
 RUN apt-get -y install \
@@ -11,6 +17,6 @@ RUN wget https://github.com/novnc/noVNC/archive/v0.6.1.tar.gz
 RUN gunzip v0.6.1.tar.gz
 RUN tar xf v0.6.1.tar
 
-EXPOSE {{websockify_port}}
+EXPOSE 6080
 
-CMD ["/noVNC-0.6.1/utils/launch.sh", "--listen", "{{websockify_port}}"]
+CMD ["/noVNC-0.6.1/utils/launch.sh", "--listen", "6080"]

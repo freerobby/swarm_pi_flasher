@@ -54,6 +54,7 @@
     image: "{{service_name}}"
     pull: false
     published_ports:
-      - "{{websockify_port}}:6080"
-    restart_policy: always
+      - "{{public_websockify_port}}:6080"
+    restart_policy: "{{restart_policy}}"
+    state: "{{container_state}}"
   become: true

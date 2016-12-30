@@ -1,4 +1,10 @@
-FROM debian:jessie
+{% if ansible_machine == "x86_64" -%}
+  FROM debian:jessie
+{% elif ansible_machine == "armv7l" -%}
+  FROM resin/rpi-raspbian:jessie-20160831
+{% else -%}
+  # No docker base available for architecture: {{ansible_machine}}
+{% endif %}
 RUN apt-get -y update
 
 # Install X dependencies

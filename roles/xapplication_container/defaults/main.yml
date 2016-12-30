@@ -9,3 +9,5 @@ public_vnc_port: 5900
 public_websockify_port: 6080
 xdisplay: 0
 executable: xapp
+restart_policy: unless-stopped
+container_state: stopped

@@ -56,5 +56,6 @@
     published_ports:
       - "{{public_vnc_port}}:5900"
       - "{{public_websockify_port}}:6080"
-    restart_policy: always
+    restart_policy: "{{restart_policy}}"
+    state: "{{container_state}}"
   become: true
