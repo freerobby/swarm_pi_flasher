@@ -31,7 +31,6 @@
         executable: lin_guider
         public_vnc_port: 5901
         public_websockify_port: 6101
-      become: true
 
     - role: xapplication_container
       vars:
@@ -59,7 +58,6 @@
         executable: phd2
         public_vnc_port: 5902
         public_websockify_port: 6102
-      become: true
 
     - role: xapplication_container
       vars:
@@ -94,10 +92,10 @@
         executable: gtkImager
         public_vnc_port: 5903
         public_websockify_port: 6103
-      become: true
 
     - role: novnc_container
-      become: true
+
+    - role: pi_frontend_container
 
   tasks:
     - name: Start containers

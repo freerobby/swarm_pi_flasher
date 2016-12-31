@@ -30,7 +30,10 @@ Vagrant.configure(2) do |config|
     config.vm.network "forwarded_port", guest: vnc_port, host: vnc_port
     config.vm.network "forwarded_port", guest: websockify_port, host: websockify_port
   end
-
   # NoVNC
   config.vm.network "forwarded_port", guest: 6080, host: 6080
+  # pi_frontend
+  config.vm.network "forwarded_port", guest: 8000, host: 8000
+
+  config.ssh.forward_agent = true
 end

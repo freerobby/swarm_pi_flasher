@@ -1,0 +1,6 @@
+---
+service_name: pi_frontend
+public_web_port: 8000
+restart_policy: unless-stopped
+container_state: stopped
+git_repo: git@github.com:freerobby/pi_frontend.git

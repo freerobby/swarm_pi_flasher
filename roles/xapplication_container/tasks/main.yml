@@ -29,16 +29,12 @@
     recurse: true
     path: /tmp/Docker/{{service_name}}
     state: directory
-  become: true
 
 - name: Generate Dockerfile for {{service_name}} docker image
   template:
     src: templates/Dockerfile.j2
     dest: /tmp/Docker/{{service_name}}/Dockerfile
     mode: 0644
-    owner: root
-    group: root
-  become: true
 
 - name: Build {{service_name}} docker image
   docker_image:

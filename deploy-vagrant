@@ -3,6 +3,8 @@
 # Usage:
 # ./deploy-vagrant
 
+ssh-add
+
 if (/usr/local/bin/vagrant status | grep "default.*not created (virtualbox)"); then
   time /usr/local/bin/vagrant up
 else
