@@ -61,7 +61,7 @@
     image: "{{service_name}}"
     pull: false
     published_ports:
-      - "{{public_web_port}}:8000"
+      - "{{public_web_port}}:80"
     restart_policy: "{{restart_policy}}"
     state: "{{container_state}}"
   become: true

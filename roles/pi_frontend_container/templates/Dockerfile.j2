@@ -8,17 +8,10 @@
 RUN apt-get -y update
 
 RUN apt-get -y install \
-  git \
-  nodejs-legacy \
-  npm
+  nginx
 
-RUN npm install -g elm
+COPY git/build /var/www/html
 
-RUN mkdir -p /stage
-COPY git /stage
+EXPOSE 80
 
-EXPOSE 8000
-
-WORKDIR /stage
-
-CMD ["elm-reactor", "-p", "8000", "-a", "0.0.0.0"]
+CMD ["nginx", "-g", "daemon off;"]
