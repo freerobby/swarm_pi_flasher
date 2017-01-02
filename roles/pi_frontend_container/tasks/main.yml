@@ -36,11 +36,16 @@
     dest: /tmp/Docker/{{service_name}}/Dockerfile
     mode: 0644
 
+- name: Install git
+  apt: name=git state=installed
+  become: true
+
 - name: Download latest code for {{service_name}}
   git:
     repo: "{{git_repo}}"
     dest: /tmp/Docker/{{service_name}}/git
     depth: 1
+    accept_hostkey: yes
 
 - name: Build {{service_name}} docker image
   docker_image:
