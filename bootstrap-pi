@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+# Usage:
+# ./bootstrap-pi <pi ip address>
+
+echo Type "raspberry" when prompted.
+cat ~/.ssh/id_rsa.pub | ssh pi@$1 "cat >> .ssh/authorized_keys"
