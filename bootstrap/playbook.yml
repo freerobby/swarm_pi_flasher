@@ -1,0 +1,27 @@
+---
+- hosts: all
+  become: true
+  tasks:
+    - name: Load Raspbian base image
+      copy:
+        src: "{{raspbian_image_path}}"
+        dest: /tmp/raspbian.bin
+
+    - name: Burn Raspbian base image
+      command: dd bs=4M if=/tmp/raspbian.bin of=/dev/sdb
+      become: true
+
+    - name: Mount root partition
+      mount:
+        name=/tmp/root
+        src=/dev/sdb2
+        fstype=ext4
+        state=mounted
+
+    - name: Configure wifi
+      template:
+        src: templates/wpa_supplicant.conf.j2
+        dest: /tmp/root/etc/wpa_supplicant/wpa_supplicant.conf
+        mode: 0600
+        owner: root
+        group: root
