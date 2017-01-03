@@ -5,6 +5,7 @@
       become: true
 
 - hosts: all
+  become: false
   roles:
     - role: xapplication_container
       vars:
