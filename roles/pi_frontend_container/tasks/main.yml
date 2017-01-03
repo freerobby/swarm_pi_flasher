@@ -46,7 +46,11 @@
     repo: "{{git_repo}}"
     dest: /tmp/Docker/{{service_name}}/git
     depth: 1
-    accept_hostkey: yes
+    accept_hostkey: true
+    force: true
+  # Remove after https://github.com/ansible/ansible-modules-core/issues/5504 is fixed
+  register: git_deploy
+  until: git_deploy|succeeded
 
 - name: Build {{service_name}} docker image
   docker_image:

@@ -3,10 +3,6 @@
 # Usage:
 # ./deploy-pi <pi ip address>
 
-#ansible-playbook --connection=ssh --timeout=30 --limit="default"  bootstrap.yml
-
-
-
 time /usr/local/bin/ansible-playbook -s bootstrap.yml -i $1, -vvv -u pi --ssh-common-args="-o ForwardAgent=yes"
 DEPLOY_RETURN_CODE=$?
 if [ "$DEPLOY_RETURN_CODE" -ne "0" ]; then
