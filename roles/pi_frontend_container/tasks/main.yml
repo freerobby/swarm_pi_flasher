@@ -29,7 +29,7 @@
     recurse: true
     path: /tmp/Docker/{{service_name}}
     state: directory
-    mode: 0777
+    mode: 0755
 
 - name: Generate Dockerfile for {{service_name}} docker image
   template:
