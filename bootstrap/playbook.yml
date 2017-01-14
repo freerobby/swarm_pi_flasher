@@ -15,9 +15,16 @@
       command: dd bs=4M if=/tmp/raspbian.bin of=/dev/sdb
       become: true
 
+    - name: Mount boot partition
+      mount:
+        name=/raspbian-boot
+        src=/dev/sdb1
+        fstype=vfat
+        state=mounted
+
     - name: Mount root partition
       mount:
-        name=/raspbian
+        name=/raspbian-root
         src=/dev/sdb2
         fstype=ext4
         state=mounted
@@ -25,7 +32,7 @@
     - name: Configure wifi
       template:
         src: templates/wpa_supplicant.conf.j2
-        dest: /raspbian/etc/wpa_supplicant/wpa_supplicant.conf
+        dest: /raspbian-root/etc/wpa_supplicant/wpa_supplicant.conf
         mode: 0600
         owner: root
         group: root
@@ -33,7 +40,7 @@
     - name: Configure keyboard
       copy:
         src: files/keyboard
-        dest: /raspbian/etc/default/keyboard
+        dest: /raspbian-root/etc/default/keyboard
         mode: 0644
         owner: root
         group: root
@@ -41,16 +48,29 @@
     - name: Configure locale
       copy:
         src: files/locale
-        dest: /raspbian/etc/default/locale
+        dest: /raspbian-root/etc/default/locale
         mode: 0644
         owner: root
         group: root
+
+    # Needed as of 2016-11-25 release. See:
+    # * https://www.raspberrypi.org/blog/a-security-update-for-raspbian-pixel
+    # * https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=166984#p1075069
+    - name: Enable SSH
+      file:
+        path: /raspbian-boot/ssh
+        state: touch
 
     - name: Flush the write cache
       command: sync
       become: true
 
+    - name: Unmount the boot partition
+      mount:
+        name=/raspbian-boot
+        state=unmounted
+
     - name: Unmount the root partition
       mount:
-        name=/raspbian
+        name=/raspbian-root
         state=unmounted
