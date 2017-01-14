@@ -3,6 +3,13 @@
 # Usage:
 # ./deploy-pi <pi ip address>
 
+echo "Detecting ssh identities..."
+ssh-add -l
+if [ "$?" -ne "0" ]; then
+  echo "No ssh identities found. Running ssh-add..."
+  ssh-add
+fi
+
 time /usr/local/bin/ansible-playbook -s bootstrap.yml -i $1, -vvv -u pi --ssh-common-args="-o ForwardAgent=yes"
 DEPLOY_RETURN_CODE=$?
 if [ "$DEPLOY_RETURN_CODE" -ne "0" ]; then
