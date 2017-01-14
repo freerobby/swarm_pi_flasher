@@ -3,5 +3,6 @@
 # Usage:
 # ./bootstrap-pi <pi ip address>
 
-echo Type "raspberry" when prompted.
-cat ~/.ssh/id_rsa.pub | ssh pi@$1 "cat >> .ssh/authorized_keys"
+echo Type "raspberry" when prompted for passwords.
+ssh pi@$1 "mkdir -p ~/.ssh"
+cat ~/.ssh/id_rsa.pub | ssh pi@$1 "cat > ~/.ssh/authorized_keys"
