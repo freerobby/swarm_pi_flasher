@@ -1,5 +1,10 @@
 ---
 - hosts: all
+  tasks:
+    - apt:
+        update_cache: true
+
+- hosts: all
   roles:
     - role: avinetworks.docker
       become: true
