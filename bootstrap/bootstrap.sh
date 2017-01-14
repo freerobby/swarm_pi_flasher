@@ -14,11 +14,18 @@ read WIFI_NETWORK
 echo "Enter target wifi password: "
 read WIFI_PASSWORD
 
-sudo vagrant \
+time sudo vagrant \
   --output-device=$OUTPUT_DEVICE \
   --raspbian-image-path=/Users/robby/workspace/astro/raspbian/2016-11-25-raspbian-jessie-lite.img \
   --wifi-network=$WIFI_NETWORK \
   --wifi-password=$WIFI_PASSWORD \
   up
 
-echo "Bootstrap complete! Log onto the box to inspect, and vagrant destroy when you're done."
+echo "Bootstrap complete! You'll be asked to confirm destruction of the VM -- that's safe to do."
+
+time sudo vagrant \
+  --output-device= \
+  --raspbian-image-path= \
+  --wifi-network= \
+  --wifi-password= \
+  destroy

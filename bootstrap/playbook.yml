@@ -2,6 +2,10 @@
 - hosts: all
   become: true
   tasks:
+    - name: Wipe out existing MBR
+      command: dd bs=512 count=1 if=/dev/zero of=/dev/sdb
+      become: true
+
     - name: Load Raspbian base image
       copy:
         src: "{{raspbian_image_path}}"
@@ -13,7 +17,7 @@
 
     - name: Mount root partition
       mount:
-        name=/tmp/root
+        name=/raspbian
         src=/dev/sdb2
         fstype=ext4
         state=mounted
@@ -21,7 +25,32 @@
     - name: Configure wifi
       template:
         src: templates/wpa_supplicant.conf.j2
-        dest: /tmp/root/etc/wpa_supplicant/wpa_supplicant.conf
+        dest: /raspbian/etc/wpa_supplicant/wpa_supplicant.conf
         mode: 0600
         owner: root
         group: root
+
+    - name: Configure keyboard
+      copy:
+        src: files/keyboard
+        dest: /raspbian/etc/default/keyboard
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: Configure locale
+      copy:
+        src: files/locale
+        dest: /raspbian/etc/default/locale
+        mode: 0644
+        owner: root
+        group: root
+
+    - name: Flush the write cache
+      command: sync
+      become: true
+
+    - name: Unmount the root partition
+      mount:
+        name=/raspbian
+        state=unmounted
