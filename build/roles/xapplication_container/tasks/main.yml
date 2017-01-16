@@ -55,4 +55,6 @@
     pull: false
     restart_policy: "{{restart_policy}}"
     state: "{{container_state}}"
+    volumes:
+      - /dev/bus/usb:/dev/bus/usb
   become: true

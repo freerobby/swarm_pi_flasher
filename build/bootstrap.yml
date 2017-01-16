@@ -32,6 +32,9 @@
           - tar xf lin_guider-4.1.0.tar
           - cd ./lin_guider_pack/lin_guider && ./configure
           - cd ./lin_guider_pack/lin_guider && make -j $(grep -c ^processor /proc/cpuinfo)
+          - wget https://downloads.sourceforge.net/project/cccd/firmware/firmware-ccd_1.3_all.deb
+          - dpkg -i firmware-ccd_1.3_all.deb
+          - echo 'ATTRS{idVendor}=="1856", ATTRS{idProduct}=="0011", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/ccd/qhy5.hex -D $env{DEVNAME} -s /lib/firmware/ccd/qhy5loader.hex"' > /etc/udev/rules.d/85-qhy-extended.rules
         stage_files:
           - /lin_guider_pack/lin_guider/lin_guider
         executable: lin_guider
@@ -60,6 +63,10 @@
           - cd /phd2/tmp && cmake ..
           - cd /phd2/tmp && make -j $(grep -c ^processor /proc/cpuinfo)
           - cd /phd2/tmp && make -j $(grep -c ^processor /proc/cpuinfo) install # Installs help file to /usr/local/share/phd2/PHD2GuideHelp.zip
+          - apt-get install -y wget
+          - wget https://downloads.sourceforge.net/project/cccd/firmware/firmware-ccd_1.3_all.deb
+          - dpkg -i firmware-ccd_1.3_all.deb ; apt-get install -f -y
+          - echo 'ATTRS{idVendor}=="1856", ATTRS{idProduct}=="0011", RUN+="/sbin/fxload -t fx2 -I /lib/firmware/ccd/qhy5.hex -D $env{DEVNAME} -s /lib/firmware/ccd/qhy5loader.hex"' > /etc/udev/rules.d/85-qhy-extended.rules
         stage_files:
           - /phd2/tmp/phd2
         executable: phd2
@@ -108,4 +115,3 @@
     - name: Start containers
       shell: docker start $(docker ps -aq)
       become: true
-
