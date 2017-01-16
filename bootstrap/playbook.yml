@@ -37,22 +37,6 @@
         owner: root
         group: root
 
-    - name: Configure keyboard
-      copy:
-        src: files/keyboard
-        dest: /raspbian-root/etc/default/keyboard
-        mode: 0644
-        owner: root
-        group: root
-
-    - name: Configure locale
-      copy:
-        src: files/locale
-        dest: /raspbian-root/etc/default/locale
-        mode: 0644
-        owner: root
-        group: root
-
     # Needed as of 2016-11-25 release. See:
     # * https://www.raspberrypi.org/blog/a-security-update-for-raspbian-pixel
     # * https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=166984#p1075069
