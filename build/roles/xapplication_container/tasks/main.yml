@@ -48,10 +48,11 @@
   docker_container:
     name: "{{service_name}}"
     image: "{{service_name}}"
-    pull: false
+    privileged: true # Easier than providing access to every possible device manually, but makes every container a security liability
     published_ports:
       - "{{public_vnc_port}}:5900"
       - "{{public_websockify_port}}:6080"
+    pull: false
     restart_policy: "{{restart_policy}}"
     state: "{{container_state}}"
   become: true
