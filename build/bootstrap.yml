@@ -59,6 +59,7 @@
           - mkdir /phd2/tmp
           - cd /phd2/tmp && cmake ..
           - cd /phd2/tmp && make -j $(grep -c ^processor /proc/cpuinfo)
+          - cd /phd2/tmp && make -j $(grep -c ^processor /proc/cpuinfo) install # Installs help file to /usr/local/share/phd2/PHD2GuideHelp.zip
         stage_files:
           - /phd2/tmp/phd2
         executable: phd2
