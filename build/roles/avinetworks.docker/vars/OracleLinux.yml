@@ -1,3 +1,0 @@
-# OracleLinux vars file for avinetworks.docker
-
-docker_package_directory: "oraclelinux"
