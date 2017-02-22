@@ -1,5 +1,27 @@
 #!/usr/bin/env sh
 
+RASPBIAN_RELEASE=2016-11-25-raspbian-jessie-lite
+RASPBIAN_URL=http://downloads.raspberrypi.org/raspbian_lite/images/raspbian_lite-2016-11-29/$RASPBIAN_RELEASE.zip
+
+if [ -e ./tmp/$RASPBIAN_RELEASE.img ]
+then
+  echo "Raspbian image found."
+else
+  echo "Raspbian image not found."
+
+  if [ -e ./tmp/$RASPBIAN_RELEASE.zip ]
+  then
+    echo "Raspbian archive found."
+  else
+    echo "Raspbian archive not found. Downloading latest..."
+    mkdir -p ./tmp
+    curl -L -o ./tmp/$RASPBIAN_RELEASE.zip $RASPBIAN_URL
+  fi
+
+  echo "Extracting Raspbian archive..."
+  unzip ./tmp/$RASPBIAN_RELEASE.zip -d ./tmp
+fi
+
 echo "Scanning devices..."
 sudo diskutil list | grep disk\\d$ | sed -E s/\ +0:\ +[^\*\+]+.//g
 
@@ -16,7 +38,7 @@ read WIFI_PASSWORD
 
 time sudo vagrant \
   --output-device=$OUTPUT_DEVICE \
-  --raspbian-image-path=/Users/robby/workspace/astro/raspbian/2016-11-25-raspbian-jessie-lite.img \
+  --raspbian-image-path=./tmp/$RASPBIAN_RELEASE.img \
   --wifi-network=$WIFI_NETWORK \
   --wifi-password=$WIFI_PASSWORD \
   up
